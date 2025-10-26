@@ -11,7 +11,7 @@ export const config: ApiRouteConfig = {
 
 interface SubmitRequest {
     channel : string;
-    email: string;
+    email: string;  
 }
 
 export const handler = async (req: any, {emit , logger, state}: any) => {
