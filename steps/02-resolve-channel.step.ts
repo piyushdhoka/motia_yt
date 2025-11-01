@@ -1,4 +1,5 @@
 import {EventConfig} from "motia";
+import { z } from 'zod';
 
 // convert yt name into  channel id using yt data api
 
@@ -7,6 +8,11 @@ export const config: EventConfig = {
     type : "event",
     subscribes: ["yt.submit"],
     emits : ["yt.channel.resolved", "yt.channel.error"],
+    input: z.object({
+        jobId: z.string().optional(),
+        email: z.string().optional(),
+        channel: z.string().optional(),
+    })
 };
 
 export const handler = async (eventData: any, {emit , logger, state}: any) => {
@@ -62,12 +68,22 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
                 status : 'failed',
                 error: 'channel not found'
             });
+            await emit({
+            topic : "yt.channel.error",
+            data : {
+                jobId,
+                email,
+            },
+        });
+        return;
         }
 
         await emit({
             topic : "yt.channel.resolved",
             data : {
                 jobId,
+                channelId,
+                channelName,
                 email,
             },
         });
