@@ -42,8 +42,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if(!YOUTUBE_API_KEY) {
             throw new Error("Missing YOUTUBE_API_KEY in environment variables");
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'fetching videos'
         })
@@ -54,7 +54,7 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if(!youtubeData.items || youtubeData.items.length === 0) {
         logger.warn("no videos found for channel", {jobId, channelId});
 
-        await state.set(`job: ${jobId}`,{
+        await state.set('job', jobId, {
             ...jobData,
             status : 'failed',
             error : "no videos found for this channel"
@@ -79,7 +79,7 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
     }));
     logger.info("fetched videos", {jobId, videoCount: videos.length});
 
-    await state.set(`job: ${jobId}`,{
+    await state.set('job', jobId, {
             ...jobData,
             status : 'videos fetched ',
             videos
@@ -103,8 +103,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
             logger.error("cannot send error notification missing jobId or email");
             return
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'failed',
             error: errMsg

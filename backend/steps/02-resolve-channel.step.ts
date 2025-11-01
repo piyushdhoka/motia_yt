@@ -32,8 +32,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if(!YOUTUBE_API_KEY) {
             throw new Error("Missing YOUTUBE_API_KEY in environment variables");
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'resolving_channel'
         })
@@ -63,7 +63,7 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         
         if(!channelId) {
             logger.error("channel not found", {channel});
-            await state.set(`job: ${jobId}`,{
+            await state.set('job', jobId, {
                 ...jobData,
                 status : 'failed',
                 error: 'channel not found'
@@ -95,8 +95,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
             logger.error("Missing jobID or email, cannot emit error event");
             return
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'failed',
             error: error.message

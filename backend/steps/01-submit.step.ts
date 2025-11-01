@@ -35,7 +35,7 @@ export const handler = async (req: any, {emit , logger, state}: any) => {
         
         const jobId = `job_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         
-        await state.set(`job: ${jobId}`,{
+        await state.set('job', jobId, {
             jobId,
             channel,
             email,

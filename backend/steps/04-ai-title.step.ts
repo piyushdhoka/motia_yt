@@ -49,8 +49,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if (!Array.isArray(videos) || videos.length === 0) {
             logger.warn('No videos found in event data, nothing to generate', { jobId });
             // update job to failed and emit error so callers know
-            const jobData = await state.get(`job: ${jobId}`)
-            await state.set(`job: ${jobId}`, {
+            const jobData = await state.get('job', jobId)
+            await state.set('job', jobId, {
                 ...jobData,
                 status: 'failed',
                 error: 'no videos provided to generate titles'
@@ -70,8 +70,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if(!GEMINI_API_KEY) {
             throw new Error("Missing gemini api key  in environment variables");
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'generating titles',
             videos
@@ -181,7 +181,7 @@ Respond in JSON format:
         }));
         console.log(' titles generated successfully', {jobId, improvedCount: improvedTitles.length});
 
-        await state.set(`job: ${jobId}`,{
+        await state.set('job', jobId, {
             ...jobData,
             status : 'titles ready',
             improvedTitles
@@ -206,8 +206,8 @@ Respond in JSON format:
             logger.ercror("cannot send error notification missing jobId or email");
             return
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'failed',
             error: errMsg

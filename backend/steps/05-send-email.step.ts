@@ -49,8 +49,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         if(!RESEND_API_KEY) {
             throw new Error("Missing RESEND api key  in environment variables");
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'sending email',
         })
@@ -79,7 +79,7 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         logger.info('email sent successfully', {jobId, emailId: emailResult.id});
 
 
-        await state.set(`job: ${jobId}`,{
+        await state.set('job', jobId, {
             ...jobData,
             status : 'completed',
             emailId: emailResult.id,
@@ -103,8 +103,8 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
             logger.error("cannot send error notification missing jobId");
             return
         }
-        const jobData = await state.get(`job: ${jobId}`)
-        await state.set(`job: ${jobId}`,{
+        const jobData = await state.get('job', jobId)
+        await state.set('job', jobId, {
             ...jobData,
             status : 'failed',
             error: errMsg
