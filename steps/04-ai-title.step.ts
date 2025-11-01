@@ -203,7 +203,7 @@ Respond in JSON format:
         logger.error("Error generating titles", { error: errMsg });
 
         if(!jobId || !email) {
-            logger.error("cannot send error notification missing jobId or email");
+            logger.ercror("cannot send error notification missing jobId or email");
             return
         }
         const jobData = await state.get(`job: ${jobId}`)

@@ -12,9 +12,12 @@ declare module 'motia' {
   }
 
   interface Handlers {
-    'generateTitles': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, never>
-    'fetchVideos': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, { topic: 'yt.videos.fetched'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } }>
-    'ResolveChannel': EventHandler<{ jobId?: string; email?: string; channel?: string }, { topic: 'yt.channel.resolved'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } }>
+    'DailyCleanup': CronHandler<never>
+    'errorHandler': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, never>
+    'sendEmail': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, never>
+    'generateTitles': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, { topic: 'yt.titles.ready'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } } | { topic: 'yt.titles.error'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } }>
+    'fetchVideos': EventHandler<{ jobId?: string; email?: string; channelId?: string; channelName?: string }, { topic: 'yt.videos.fetched'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } } | { topic: 'yt.videos.error'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } }>
+    'ResolveChannel': EventHandler<{ jobId?: string; email?: string; channel?: string }, { topic: 'yt.channel.resolved'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } } | { topic: 'yt.channel.error'; data: { jobId?: string; email?: string; channelId?: string; channelName?: string } }>
     'SubmitChannel': ApiRouteHandler<Record<string, unknown>, unknown, { topic: 'yt.submit'; data: { jobId?: string; email?: string; channel?: string } }>
   }
 }
