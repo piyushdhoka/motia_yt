@@ -41,25 +41,60 @@ export const handler = async (eventData: any, {emit , logger, state}: any) => {
         let channelId: string | null = null
         let channelName: string = ""
 
-        if (channel.startsWith('@')) {
-            const handle = channel.substring(1);
-            const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(handle)}&key=${YOUTUBE_API_KEY}`;
+        // Helper to try searching YouTube for a given query and return first match
+        const trySearch = async (query: string) => {
+            const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(query)}&key=${YOUTUBE_API_KEY}`;
             const searchResponse = await fetch(searchUrl);
             const searchData = await searchResponse.json();
-            if (searchData.items && searchData.items.length > 0){
-                channelId = searchData.items[0].snippet.channelId;
-                channelName = searchData.items[0].snippet.title;
+            if (searchData && Array.isArray(searchData.items) && searchData.items.length > 0) {
+                return {
+                    id: searchData.items[0].snippet.channelId,
+                    name: searchData.items[0].snippet.title,
+                };
             }
-        }
-        else {
-                const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=channel&q=${encodeURIComponent(channel)}&key=${YOUTUBE_API_KEY}`;
-                const searchResponse = await fetch(searchUrl);
-                const searchData = await searchResponse.json();
-                if (searchData.items && searchData.items.length > 0){
-                    channelId = searchData.items[0].snippet.channelId;
-                    channelName = searchData.items[0].snippet.title;
+            return null;
+        };
+
+        if (typeof channel === 'string') {
+            const raw = channel.trim();
+
+            // Build candidate queries to handle handles and names with spaces.
+            const candidates: string[] = [];
+            if (raw.startsWith('@')) {
+                const afterAt = raw.substring(1).trim();
+                // common variations: no spaces (handles typically have no spaces), original, hyphenated
+                candidates.push(afterAt.replace(/\s+/g, ''));
+                candidates.push(afterAt);
+                candidates.push(afterAt.replace(/\s+/g, '-'));
+            } else {
+                candidates.push(raw);
+                candidates.push(raw.replace(/\s+/g, ''));
+                candidates.push(raw.replace(/\s+/g, '-'));
+            }
+
+            // Deduplicate candidates while preserving order
+            const seen = new Set<string>();
+            const uniqCandidates = candidates.filter((c) => {
+                const key = c.toLowerCase();
+                if (seen.has(key) || !c) return false;
+                seen.add(key);
+                return true;
+            });
+
+            for (const q of uniqCandidates) {
+                try {
+                    logger.info('trying channel search', { jobId, q });
+                    const found = await trySearch(q);
+                    if (found) {
+                        channelId = found.id;
+                        channelName = found.name;
+                        break;
+                    }
+                } catch (err: any) {
+                    logger.warn('youtube search attempt failed', { jobId, q, err: err?.message });
                 }
             }
+        }
         
         if(!channelId) {
             logger.error("channel not found", {channel});
