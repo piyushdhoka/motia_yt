@@ -146,11 +146,11 @@ const UserProfile = ({ user, onSignOut }: UserProfileProps) => {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {user.firstName || "User"}
+                    {user.firstName || user.username || "User"}
                   </p>
                   <p className="text-xs text-gray-500 truncate flex items-center">
                     <Mail className="w-3 h-3 mr-1" />
-                    {user.emailAddress || ""}
+                    {user.primaryEmailAddress?.emailAddress || user.emailAddress || ""}
                   </p>
                 </div>
               </div>
