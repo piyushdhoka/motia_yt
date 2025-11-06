@@ -83,8 +83,8 @@ const UserProfile = ({ user, onSignOut }: UserProfileProps) => {
         <div className="relative">
           {user?.imageUrl ? (
             <img
-              src={user.imageUrl}
-              alt={user.firstName || "User"}
+              src={user.imageUrl || ''}
+              alt={user.firstName || user.username || "User"}
               className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
             />
           ) : (
