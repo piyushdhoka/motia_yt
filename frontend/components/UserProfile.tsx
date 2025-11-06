@@ -98,10 +98,10 @@ const UserProfile = ({ user, onSignOut }: UserProfileProps) => {
         {/* User Info */}
         <div className="hidden sm:block text-left">
           <p className="text-sm font-semibold text-gray-900 truncate max-w-32">
-            {user.firstName || "User"}
+            {user.firstName || user.username || "User"}
           </p>
           <p className="text-xs text-gray-500 truncate max-w-32">
-            {user.emailAddress || ""}
+            {user.primaryEmailAddress?.emailAddress || user.emailAddress || ""}
           </p>
         </div>
 
