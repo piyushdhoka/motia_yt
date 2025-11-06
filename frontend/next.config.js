@@ -1,12 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
-
-  // Configure path aliases
-  experimental: {
-    esmExternals: false,
-  },
 
   // Configure transpilation for node_modules
   transpilePackages: ['better-auth'],
@@ -26,11 +20,6 @@ const nextConfig = {
       };
     }
     return config;
-  },
-
-  // Environment variables available in the browser
-  env: {
-    NEXT_PUBLIC_DEV_MODE: process.env.NODE_ENV !== 'production',
   },
 }
 
