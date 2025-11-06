@@ -1,29 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 import { motion } from "framer-motion";
+import { useSignIn } from "@clerk/nextjs";
 import { Chrome, Lock, Shield, Clock } from "lucide-react";
 
 const SignInPrompt = () => {
+  const { signIn, isLoaded } = useSignIn();
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
 
   const handleGoogleSignIn = async () => {
+    if (!isLoaded) return;
+
     setIsLoading(true);
     setError("");
 
     try {
-      await signIn("google", { 
-        callbackUrl: "/",
-        redirect: true 
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
+        redirectUrl: window.location.origin,
+        redirectUrlComplete: window.location.origin,
       });
     } catch (err) {
       setError("Failed to sign in with Google. Please try again.");
       console.error("Sign in error:", err);
-    } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleClerkSignIn = () => {
+    router.push('/sign-in');
   };
 
   const containerVariants = {
@@ -91,7 +100,7 @@ const SignInPrompt = () => {
             variants={buttonVariants}
             whileHover="hover"
             whileTap="tap"
-            onClick={handleGoogleSignIn}
+            onClick={handleClerkSignIn}
             disabled={isLoading}
             className="w-full bg-white border-2 border-gray-200 hover:border-blue-300 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
           >

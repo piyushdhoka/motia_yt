@@ -3,17 +3,18 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Youtube, Mail, Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { FormData, ApiResponse } from "@/lib/types";
 
 const ChannelForm = () => {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     channelName: "",
     email: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -24,7 +25,7 @@ const ChannelForm = () => {
     if (error) setError("");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Basic validation
@@ -47,8 +48,12 @@ const ChannelForm = () => {
     setError("");
 
     try {
-      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8080";
-      const response = await fetch(`${backendUrl}/api/submit`, {
+      const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      if (!backendUrl) {
+        throw new Error("Backend URL not configured");
+      }
+
+      const response = await fetch(`${backendUrl.replace(/\/$/, '')}/api/submit`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -60,7 +65,7 @@ const ChannelForm = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const result = await response.json();
+      const result: ApiResponse = await response.json();
 
       if (result.success) {
         setIsSuccess(true);
@@ -72,7 +77,7 @@ const ChannelForm = () => {
         throw new Error(result.message || "Submission failed");
       }
     } catch (err) {
-      setError(err.message || "Failed to submit. Please try again.");
+      setError(err instanceof Error ? err.message : "Failed to submit. Please try again.");
       console.error("Submission error:", err);
     } finally {
       setIsLoading(false);

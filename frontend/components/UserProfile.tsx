@@ -1,23 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { signOut } from "next-auth/react";
 import { motion } from "framer-motion";
 import { User, Mail, LogOut, History, Settings, ChevronDown } from "lucide-react";
+import { User as UserType } from "@/lib/types";
 
-const UserProfile = ({ user, onSignOut }) => {
+interface UserProfileProps {
+  user: UserType;
+  onSignOut: () => void;
+}
+
+const UserProfile = ({ user, onSignOut }: UserProfileProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleSignOut = async () => {
-    setIsSigningOut(true);
-    try {
-      await signOut({ callbackUrl: "/" });
-      if (onSignOut) onSignOut();
-    } catch (error) {
-      console.error("Sign out error:", error);
-      setIsSigningOut(false);
-    }
+  const handleSignOut = () => {
+    onSignOut();
+    setIsDropdownOpen(false);
   };
 
   const dropdownVariants = {
@@ -69,7 +67,6 @@ const UserProfile = ({ user, onSignOut }) => {
       label: "Sign Out",
       action: handleSignOut,
       color: "text-red-600",
-      disabled: isSigningOut,
     },
   ];
 
@@ -84,19 +81,27 @@ const UserProfile = ({ user, onSignOut }) => {
       >
         {/* User Avatar - Icon Only */}
         <div className="relative">
-          <div className="w-10 h-10 bg-gradient-to-br from-secondary to-red-600 rounded-full flex items-center justify-center shadow-sm">
-            <User className="w-5 h-5 text-white" />
-          </div>
+          {user?.imageUrl ? (
+            <img
+              src={user.imageUrl || ''}
+              alt={user.firstName || user.username || "User"}
+              className="w-10 h-10 rounded-full object-cover border-2 border-white shadow-sm"
+            />
+          ) : (
+            <div className="w-10 h-10 bg-gradient-to-br from-secondary to-red-600 rounded-full flex items-center justify-center shadow-sm">
+              <User className="w-5 h-5 text-white" />
+            </div>
+          )}
           <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
         </div>
 
         {/* User Info */}
         <div className="hidden sm:block text-left">
           <p className="text-sm font-semibold text-gray-900 truncate max-w-32">
-            {user?.name || "User"}
+            {user.firstName || user.username || "User"}
           </p>
           <p className="text-xs text-gray-500 truncate max-w-32">
-            {user?.email || ""}
+            {user.primaryEmailAddress?.emailAddress || user.emailAddress || ""}
           </p>
         </div>
 
@@ -128,10 +133,10 @@ const UserProfile = ({ user, onSignOut }) => {
             {/* User Info Header */}
             <div className="p-4 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
               <div className="flex items-center space-x-3">
-                {user?.image ? (
+                {user?.imageUrl ? (
                   <img
-                    src={user.image}
-                    alt={user.name || "User"}
+                    src={user.imageUrl || ''}
+                    alt={user.firstName || user.username || "User"}
                     className="w-12 h-12 rounded-full object-cover border-2 border-white shadow-sm"
                   />
                 ) : (
@@ -141,11 +146,11 @@ const UserProfile = ({ user, onSignOut }) => {
                 )}
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {user?.name || "User"}
+                    {user.firstName || user.username || "User"}
                   </p>
                   <p className="text-xs text-gray-500 truncate flex items-center">
                     <Mail className="w-3 h-3 mr-1" />
-                    {user?.email || ""}
+                    {user.primaryEmailAddress?.emailAddress || user.emailAddress || ""}
                   </p>
                 </div>
               </div>
@@ -161,17 +166,10 @@ const UserProfile = ({ user, onSignOut }) => {
                     whileHover={{ scale: 1.02, x: 2 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      if (!item.disabled) {
-                        item.action();
-                        setIsDropdownOpen(false);
-                      }
+                      item.action();
+                      setIsDropdownOpen(false);
                     }}
-                    disabled={item.disabled}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 ${
-                      item.disabled
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-gray-50 cursor-pointer"
-                    }`}
+                    className="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 hover:bg-gray-50 cursor-pointer"
                   >
                     <div className={`p-2 rounded-lg bg-gray-50 ${item.color}`}>
                       <Icon className="w-4 h-4" />
@@ -179,11 +177,6 @@ const UserProfile = ({ user, onSignOut }) => {
                     <span className="text-sm font-medium text-gray-700">
                       {item.label}
                     </span>
-                    {item.disabled && (
-                      <div className="ml-auto">
-                        <div className="w-4 h-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-                      </div>
-                    )}
                   </motion.button>
                 );
               })}

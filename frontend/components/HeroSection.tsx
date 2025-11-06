@@ -2,9 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Play, TrendingUp, Zap } from "lucide-react";
+import { FeatureCard } from "@/lib/types";
 
 const HeroSection = () => {
-  const features = [
+  const features: FeatureCard[] = [
     {
       icon: Play,
       title: "Instant Analysis",

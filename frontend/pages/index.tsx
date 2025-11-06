@@ -1,20 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import HeroSection from "../components/HeroSection";
-import SignInPrompt from "../components/SignInPrompt";
-import UserProfile from "../components/UserProfile";
-import ChannelForm from "../components/ChannelForm";
+import { useUser, useClerk } from "@clerk/nextjs";
+import HeroSection from "@/components/HeroSection";
+import SignInPrompt from "@/components/SignInPrompt";
+import UserProfile from "@/components/UserProfile";
+import ChannelForm from "@/components/ChannelForm";
 import { AlertCircle, Youtube, Menu, X } from "lucide-react";
+import { User } from "@/lib/types";
 
 export default function Home() {
-  const { data: session, status } = useSession();
-  const isPending = status === "loading";
+  const { isSignedIn, isLoaded, user } = useUser();
+  const { signOut } = useClerk();
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [backendError, setBackendError] = useState("");
+  const [backendError, setBackendError] = useState<string>("");
 
   // Check backend configuration
   useEffect(() => {
@@ -25,7 +26,7 @@ export default function Home() {
   }, []);
 
   const handleGetStarted = () => {
-    if (session?.user) {
+    if (isSignedIn && user) {
       // User is authenticated, scroll to form
       document.getElementById("channel-form")?.scrollIntoView({ behavior: "smooth" });
     } else {
@@ -34,8 +35,8 @@ export default function Home() {
     }
   };
 
-  const handleSignOut = () => {
-    // Handle sign out logic
+  const handleSignOut = async () => {
+    await signOut();
     setShowAuthPrompt(false);
   };
 
@@ -50,7 +51,7 @@ export default function Home() {
     },
   };
 
-  if (isPending) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
         <div className="text-center">
@@ -95,8 +96,8 @@ export default function Home() {
               </nav>
 
               {/* User Profile / Sign In */}
-              {session?.user ? (
-                <UserProfile user={session.user} onSignOut={handleSignOut} />
+              {isSignedIn && user ? (
+                <UserProfile user={user as User} onSignOut={handleSignOut} />
               ) : (
                 <button
                   onClick={() => setShowAuthPrompt(true)}
@@ -137,9 +138,9 @@ export default function Home() {
                 <a href="#pricing" className="block py-2 text-gray-600 hover:text-secondary">
                   Pricing
                 </a>
-                {session?.user ? (
+                {isSignedIn && user ? (
                   <div className="pt-2 border-t border-gray-100">
-                    <UserProfile user={session.user} onSignOut={handleSignOut} />
+                    <UserProfile user={user as User} onSignOut={handleSignOut} />
                   </div>
                 ) : (
                   <button
@@ -198,7 +199,7 @@ export default function Home() {
         </AnimatePresence>
 
         {/* Channel Form Section - Only show for authenticated users */}
-        {session?.user && (
+        {isSignedIn && user && (
           <section id="channel-form" className="py-20 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
               <div className="text-center mb-16">
