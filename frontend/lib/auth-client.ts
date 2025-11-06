@@ -28,12 +28,8 @@ export const signInWithGoogle = async () => {
 
 export const signOutUser = async () => {
   try {
-    await signOut({
-      fetchOptions: {
-      onSuccess: () => {
-        window.location.href = "/";
-      },
-    });
+    await signOut();
+    window.location.href = "/";
   } catch (error) {
     console.error("Sign out error:", error);
     throw error;
