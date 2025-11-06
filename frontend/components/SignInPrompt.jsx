@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Chrome, Lock, Shield, Clock } from "lucide-react";
-import { signInWithGoogle } from "@/lib/auth-client";
+import { signInWithGoogle } from "../lib/auth-client";
 
 const SignInPrompt = () => {
   const [isLoading, setIsLoading] = useState(false);
