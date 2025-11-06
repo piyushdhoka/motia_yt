@@ -1,4 +1,3 @@
-import React from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
 
 interface ClerkLayoutProps {
