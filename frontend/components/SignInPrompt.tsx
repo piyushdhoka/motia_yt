@@ -6,7 +6,7 @@ import { useClerk } from "@clerk/nextjs";
 import { Chrome, Lock, Shield, Clock } from "lucide-react";
 
 const SignInPrompt = () => {
-  const { signInWithRedirect } = useClerk();
+  const { signInWithOAuth } = useClerk();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
@@ -15,7 +15,10 @@ const SignInPrompt = () => {
     setError("");
 
     try {
-      await signInWithRedirect({ strategy: "oauth_google" });
+      await signInWithOAuth({
+        provider: "google",
+        redirectUrl: "/",
+      });
     } catch (err) {
       setError("Failed to sign in with Google. Please try again.");
       console.error("Sign in error:", err);
