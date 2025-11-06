@@ -14,7 +14,10 @@ const SignInPrompt = () => {
     setError("");
 
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { 
+        callbackUrl: "/",
+        redirect: true 
+      });
     } catch (err) {
       setError("Failed to sign in with Google. Please try again.");
       console.error("Sign in error:", err);
