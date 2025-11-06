@@ -5,19 +5,13 @@ interface ClerkLayoutProps {
 }
 
 export function ClerkLayout({ children }: ClerkLayoutProps) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  if (!publishableKey) {
-    console.warn('NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is not set');
-  }
-
   return (
     <ClerkProvider
-      publishableKey={publishableKey || ''}
       appearance={{
         elements: {
-          formButtonPrimary: "bg-secondary hover:bg-red-600 text-white",
-          card: "glass-card"
+          formButtonPrimary: "bg-red-500 hover:bg-red-600 text-white",
+          card: "shadow-xl",
+          footerAction: "hidden"
         }
       }}
     >

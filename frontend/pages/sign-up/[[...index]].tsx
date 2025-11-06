@@ -6,12 +6,16 @@ export default function SignUpPage() {
       <SignUp 
         appearance={{
           elements: {
-            formButtonPrimary: "bg-secondary hover:bg-red-600 text-white",
-            card: "shadow-2xl"
+            formButtonPrimary: "bg-red-500 hover:bg-red-600 text-white",
+            card: "shadow-2xl",
+            footerActionLink: "text-red-500 hover:text-red-600"
           }
         }}
-        routing="path"
         path="/sign-up"
+        routing="path"
+        signInUrl="/sign-in"
+        afterSignInUrl="/"
+        afterSignUpUrl="/"
       />
     </div>
   );
