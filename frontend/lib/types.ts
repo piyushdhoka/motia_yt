@@ -7,9 +7,12 @@ export interface User {
   id: string;
   firstName?: string;
   lastName?: string;
-  emailAddress: string;
+  emailAddress?: string;
   imageUrl?: string;
   username?: string;
+  primaryEmailAddress?: {
+    emailAddress: string;
+  };
 }
 
 export interface Session {
