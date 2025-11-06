@@ -55,8 +55,9 @@ const ChannelForm = () => {
       }
 
       // Clean up URL and construct endpoint
+      // Backend uses Motia framework - endpoint is /submit NOT /api/submit
       const cleanUrl = backendUrl.replace(/\/$/, '');
-      const endpoint = `${cleanUrl}/api/submit`;
+      const endpoint = `${cleanUrl}/submit`;
       
       console.log('Submitting to:', endpoint);
       
