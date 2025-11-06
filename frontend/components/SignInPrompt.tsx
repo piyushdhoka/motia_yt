@@ -2,22 +2,25 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { useClerk } from "@clerk/nextjs";
+import { useSignIn } from "@clerk/nextjs";
 import { Chrome, Lock, Shield, Clock } from "lucide-react";
 
 const SignInPrompt = () => {
-  const { signInWithOAuth } = useClerk();
+  const { signIn, isLoaded } = useSignIn();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
 
   const handleGoogleSignIn = async () => {
+    if (!isLoaded) return;
+
     setIsLoading(true);
     setError("");
 
     try {
-      await signInWithOAuth({
-        provider: "google",
+      await signIn.authenticateWithRedirect({
+        strategy: "oauth_google",
         redirectUrl: "/",
+        redirectUrlComplete: "/",
       });
     } catch (err) {
       setError("Failed to sign in with Google. Please try again.");
