@@ -4,7 +4,7 @@ interface ClerkLayoutProps {
   children: React.ReactNode;
 }
 
-export function ClerkLayout({ children }: ClerkLayoutProps): JSX.Element {
+export function ClerkLayout({ children }: ClerkLayoutProps) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
   if (!publishableKey) {
