@@ -1,6 +1,17 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 
+// Get the correct URL for production
+const getAuthUrl = () => {
+  if (process.env.NEXTAUTH_URL) {
+    return process.env.NEXTAUTH_URL;
+  }
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+  return "http://localhost:3000";
+};
+
 // NextAuth configuration for Google OAuth
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -11,6 +22,7 @@ export const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: "/",
+    error: "/", // Redirect errors to home page
   },
   callbacks: {
     async session({ session, token }) {
