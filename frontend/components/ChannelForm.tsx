@@ -49,23 +49,43 @@ const ChannelForm = () => {
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+      
       if (!backendUrl) {
-        throw new Error("Backend URL not configured");
+        throw new Error("Backend URL not configured. Please set NEXT_PUBLIC_BACKEND_URL in .env.local");
       }
 
-      const response = await fetch(`${backendUrl.replace(/\/$/, '')}/api/submit`, {
+      // Clean up URL and construct endpoint
+      const cleanUrl = backendUrl.replace(/\/$/, '');
+      const endpoint = `${cleanUrl}/api/submit`;
+      
+      console.log('Submitting to:', endpoint);
+      
+      // Backend expects 'channel' not 'channelName'
+      const payload = {
+        channel: formData.channelName,
+        email: formData.email
+      };
+      
+      console.log('Payload:', payload);
+
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
+      console.log('Response status:', response.status);
+
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`Backend error: ${response.status} - ${errorText || 'Please check if the backend is running'}`);
       }
 
       const result: ApiResponse = await response.json();
+      console.log('Response data:', result);
 
       if (result.success) {
         setIsSuccess(true);
@@ -77,7 +97,8 @@ const ChannelForm = () => {
         throw new Error(result.message || "Submission failed");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit. Please try again.");
+      const errorMessage = err instanceof Error ? err.message : "Failed to submit. Please try again.";
+      setError(errorMessage);
       console.error("Submission error:", err);
     } finally {
       setIsLoading(false);
