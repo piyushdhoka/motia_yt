@@ -1,3 +1,5 @@
+import { User as ClerkUser } from '@clerk/nextjs/server';
+
 export interface FormData {
   channelName: string;
   email: string;
@@ -5,19 +7,14 @@ export interface FormData {
 
 export interface User {
   id: string;
-  firstName?: string;
-  lastName?: string;
-  emailAddress?: string;
-  imageUrl?: string;
-  username?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  emailAddress?: string | null;
+  imageUrl?: string | null;
+  username?: string | null;
   primaryEmailAddress?: {
     emailAddress: string;
-  };
-}
-
-export interface Session {
-  user: User;
-  expiresAt: number;
+  } | null;
 }
 
 export interface ApiResponse {
