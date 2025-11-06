@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSession } from "@/lib/auth-client";
-import HeroSection from "@/components/HeroSection";
-import SignInPrompt from "@/components/SignInPrompt";
-import UserProfile from "@/components/UserProfile";
-import ChannelForm from "@/components/ChannelForm";
+import { useSession } from "../lib/auth-client";
+import HeroSection from "../components/HeroSection";
+import SignInPrompt from "../components/SignInPrompt";
+import UserProfile from "../components/UserProfile";
+import ChannelForm from "../components/ChannelForm";
 import { AlertCircle, Youtube, Menu, X } from "lucide-react";
 
 export default function Home() {
