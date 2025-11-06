@@ -54,39 +54,80 @@ const ChannelForm = () => {
         throw new Error("Backend URL not configured. Please set NEXT_PUBLIC_BACKEND_URL in .env.local");
       }
 
-      // Clean up URL and construct endpoint
-      // Backend uses Motia framework - endpoint is /submit NOT /api/submit
+      // Clean up URL and construct candidate endpoints
+      // Primary: /submit (Motia default). Fallback: /api/submit (legacy/proxy setups)
       const cleanUrl = backendUrl.replace(/\/$/, '');
-      const endpoint = `${cleanUrl}/submit`;
-      
-      console.log('Submitting to:', endpoint);
-      
+      const candidatePaths = ['/submit', '/api/submit'];
+
       // Backend expects 'channel' not 'channelName'
       const payload = {
         channel: formData.channelName,
         email: formData.email
       };
-      
+
       console.log('Payload:', payload);
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      let lastErrorText: string | undefined;
+      let lastStatus: number | undefined;
+      let attempted: string[] = [];
 
-      console.log('Response status:', response.status);
+      let response: Response | undefined;
+      let usedEndpoint: string | undefined;
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        throw new Error(`Backend error: ${response.status} - ${errorText || 'Please check if the backend is running'}`);
+      for (const path of candidatePaths) {
+        const endpoint = `${cleanUrl}${path}`;
+        attempted.push(endpoint);
+        console.log('Submitting to:', endpoint);
+        try {
+          const res = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          });
+
+          console.log('Response status:', res.status, 'for', endpoint);
+          if (res.ok) {
+            response = res;
+            usedEndpoint = endpoint;
+            break;
+          }
+
+          lastStatus = res.status;
+          try {
+            lastErrorText = await res.text();
+          } catch (_) {
+            lastErrorText = undefined;
+          }
+
+          // If 404, try next candidate. For other status codes, stop early.
+          if (res.status === 404) {
+            console.warn(`Endpoint not found (404) at ${endpoint}, trying next candidate if available...`);
+            continue;
+          } else {
+            throw new Error(`Backend error: ${res.status} - ${lastErrorText || 'Unknown error'}`);
+          }
+        } catch (fetchErr) {
+          // Network/CORS error or thrown above: try next endpoint only for 404 or network errors
+          console.warn(`Fetch attempt failed for ${endpoint}:`, fetchErr);
+          // Continue to next candidate on network failures. If it's not a 404 path issue, we'll capture in final error below.
+          continue;
+        }
+      }
+
+      if (!response || !usedEndpoint) {
+        const detail = lastStatus
+          ? `Last status ${lastStatus}${lastErrorText ? `: ${lastErrorText.substring(0, 200)}` : ''}`
+          : 'No response (network/CORS error)';
+        throw new Error(
+          `Unable to reach backend. Tried: ${attempted.join(', ')}. ${detail}.\n` +
+          `Tips: Ensure your backend exposes POST /submit (Motia default), NEXT_PUBLIC_BACKEND_URL is correct, and CORS allows this origin.`
+        );
       }
 
       const result: ApiResponse = await response.json();
-      console.log('Response data:', result);
+      console.log('Response data from', usedEndpoint, ':', result);
 
       if (result.success) {
         setIsSuccess(true);
