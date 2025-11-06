@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, Mail, LogOut, History, Settings, ChevronDown } from "lucide-react";
-import { signOutUser } from "@/lib/auth-client";
+import { signOutUser } from "../lib/auth-client";
 
 const UserProfile = ({ user, onSignOut }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
