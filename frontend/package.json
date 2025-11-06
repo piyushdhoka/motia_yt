@@ -8,12 +8,16 @@
     "start": "next start -p 3000"
   },
   "dependencies": {
+    "@auth/pg-adapter": "^1.11.1",
+    "@supabase/supabase-js": "^2.79.0",
     "@tailwindcss/forms": "^0.5.7",
     "autoprefixer": "^10.4.0",
-    "better-auth": "^1.2.0",
+    "dotenv": "^17.2.3",
     "framer-motion": "^11.0.0",
     "lucide-react": "^0.400.0",
     "next": "15.5.6",
+    "next-auth": "^4.24.13",
+    "pg-pool": "^3.10.1",
     "postcss": "^8.4.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -22,6 +26,7 @@
   "devDependencies": {
     "@types/node": "24.10.0",
     "@types/react": "19.2.2",
+    "tsx": "^4.20.6",
     "typescript": "5.9.3"
   }
 }

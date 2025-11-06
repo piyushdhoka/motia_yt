@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 import { motion } from "framer-motion";
 import { Chrome, Lock, Shield, Clock } from "lucide-react";
-import { signInWithGoogle } from "../lib/auth-client";
 
 const SignInPrompt = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -14,7 +14,7 @@ const SignInPrompt = () => {
     setError("");
 
     try {
-      await signInWithGoogle();
+      await signIn("google", { callbackUrl: "/" });
     } catch (err) {
       setError("Failed to sign in with Google. Please try again.");
       console.error("Sign in error:", err);

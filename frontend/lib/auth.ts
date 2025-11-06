@@ -1,33 +1,24 @@
-import { betterAuth } from "better-auth";
-import { nextCookies } from "better-auth/next-js";
+import { NextAuthOptions } from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
-export const auth = betterAuth({
-  emailAndPassword: {
-    enabled: false,
-  },
-  socialProviders: {
-    google: {
+export const authOptions: NextAuthOptions = {
+  providers: [
+    GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
-      enabled: true,
+    }),
+  ],
+  pages: {
+    signIn: "/",
+  },
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user) {
+        // Add user ID to session
+        (session.user as any).id = token.sub || "";
+      }
+      return session;
     },
   },
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // 1 day
-    cookieCache: {
-      enabled: true,
-      maxAge: 60 * 5, // 5 minutes
-    },
-  },
-  advanced: {
-    generateId: false,
-  },
-  account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google"],
-    },
-  },
-  plugins: [nextCookies()],
-});
+  secret: process.env.NEXTAUTH_SECRET,
+};

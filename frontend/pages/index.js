@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSession } from "next-auth/react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSession } from "../lib/auth-client";
 import HeroSection from "../components/HeroSection";
 import SignInPrompt from "../components/SignInPrompt";
 import UserProfile from "../components/UserProfile";
@@ -10,7 +10,8 @@ import ChannelForm from "../components/ChannelForm";
 import { AlertCircle, Youtube, Menu, X } from "lucide-react";
 
 export default function Home() {
-  const { data: session, isPending } = useSession();
+  const { data: session, status } = useSession();
+  const isPending = status === "loading";
   const [showAuthPrompt, setShowAuthPrompt] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [backendError, setBackendError] = useState("");
